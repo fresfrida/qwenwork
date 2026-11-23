@@ -1,0 +1,10 @@
+import {DatabaseSync} from 'node:sqlite';import fs from 'node:fs';import path from 'node:path';
+export class Store{constructor(dir){this.dir=dir;this.db=null;if(!dir)return;fs.mkdirSync(dir,{recursive:true,mode:0o700});fs.chmodSync(dir,0o700);this.db=new DatabaseSync(path.join(dir,'studio.sqlite'));this.db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; CREATE TABLE IF NOT EXISTS films(id TEXT PRIMARY KEY, idem TEXT UNIQUE, record TEXT NOT NULL); CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, csrf TEXT, expires INTEGER); CREATE TABLE IF NOT EXISTS payments(id TEXT PRIMARY KEY, idem TEXT UNIQUE, record TEXT NOT NULL); CREATE TABLE IF NOT EXISTS events(id TEXT PRIMARY KEY);');fs.chmodSync(path.join(dir,'studio.sqlite'),0o600);this.recover();}
+require(){if(!this.db)throw new Error('Private storage is not configured; no data was saved');}
+recover(){for(const f of this.list()){let changed=false;for(const s of f.stages)if(s.status==='in progress'){s.status='failed';s.errors.push({at:new Date().toISOString(),message:'Running work interrupted by restart; manual retry required'});changed=true;}if(changed){f.status='failed';this.save(f);}}}
+list(){return this.db?this.db.prepare('SELECT record FROM films ORDER BY rowid DESC').all().map(r=>JSON.parse(r.record)):[];}
+get(id){this.require();const r=this.db.prepare('SELECT record FROM films WHERE id=?').get(id);if(!r)throw new Error('Film not found');return JSON.parse(r.record);}
+byIdem(id){this.require();const r=this.db.prepare('SELECT record FROM films WHERE idem=?').get(id);return r?JSON.parse(r.record):null;}
+save(f,idem){this.require();if(this.failWrites)throw new Error('Storage write failed; nothing was saved');const text=JSON.stringify(f);if(idem)this.db.prepare('INSERT INTO films(id,idem,record) VALUES(?,?,?)').run(f.id,idem,text);else this.db.prepare('UPDATE films SET record=? WHERE id=?').run(text,f.id);const read=this.get(f.id);if(JSON.stringify(read)!==text)throw new Error('Storage read-back failed');return read;}
+close(){this.db?.close();}
+}
