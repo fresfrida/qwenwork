@@ -1,0 +1,33 @@
+[
+  {
+    "id": "story-v1",
+    "title": "The little signal",
+    "duration": 18,
+    "url": "/demos/story.mp4",
+    "poster": "/demos/story.png",
+    "captions": "/demos/story.vtt",
+    "burned": true,
+    "public": true,
+    "notice": "Notice the beginning, reflected turn and resolved ending. Audible synthetic narration, timed readable captions and one closing note. Prerecorded, not generated from a later brief."
+  },
+  {
+    "id": "loop",
+    "title": "One perfect orbit",
+    "duration": 8,
+    "url": "/demos/loop.mp4",
+    "poster": "/demos/loop.png",
+    "public": true,
+    "notice": "Listen for the original soft click as the bead crosses each marker. The movement returns to its starting point. Prerecorded local animation, no speech."
+  },
+  {
+    "id": "story-v2",
+    "title": "The little signal \u2014 prepared cut 2",
+    "duration": 18,
+    "url": "/demos/story-v2.mp4",
+    "poster": "/demos/story-v2.png",
+    "captions": "/demos/story.vtt",
+    "burned": true,
+    "public": false,
+    "notice": "Prepared revision: warm amber ending instead of cool blue, and a louder three-note ending instead of one note. Not a feedback-generated edit."
+  }
+]
